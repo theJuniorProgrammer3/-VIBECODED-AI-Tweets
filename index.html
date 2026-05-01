@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AITweets</title>
+  <!-- Font Awesome 6 untuk ikon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #e7e9ea;
+      font-family: 'TwitterChirp', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Kontainer utama tiga kolom */
+    .app-container {
+      display: flex;
+      max-width: 1264px;
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    /* SIDEBAR KIRI */
+    .sidebar-left {
+      width: 275px;
+      flex-shrink: 0;
+      padding: 0 12px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid #2f3336;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      padding: 16px 12px;
+      font-size: 28px;
+      color: #e7e9ea;
+      text-decoration: none;
+      margin-bottom: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px;
+      border-radius: 999px;
+      color: #e7e9ea;
+      font-size: 19px;
+      font-weight: 400;
+      margin-bottom: 4px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .nav-item i {
+      width: 26px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .nav-item:hover {
+      background: rgba(239, 243, 244, 0.1);
+    }
+
+    .nav-item.active {
+      font-weight: 700;
+    }
+
+    .tweet-btn {
+      background: #1d9bf0;
+      color: #fff;
+      font-weight: 700;
+      font-size: 17px;
+      padding: 15px 0;
+      border-radius: 999px;
+      text-align: center;
+      margin-top: 12px;
+      margin-bottom: 12px;
+      cursor: default;
+      border: none;
+      width: 100%;
+      text-decoration: none;
+      display: block;
+      transition: background 0.2s;
+    }
+
+    .tweet-btn:hover {
+      background: #1a8cd8;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 999px;
+      cursor: default;
+    }
+
+    .user-menu:hover {
+      background: rgba(239, 243, 244, 0.1);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1d9bf0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .user-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      line-height: 18px;
+    }
+
+    .user-name {
+      font-weight: 700;
+    }
+
+    .user-handle {
+      color: #71767b;
+    }
+
+    .more-icon {
+      font-size: 18px;
+      color: #71767b;
+    }
+
+    /* FEED TENGAH */
+    .main-feed {
+      width: 600px;
+      flex-shrink: 0;
+      border-right: 1px solid #2f3336;
+      min-height: 100vh;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(12px);
+      background: rgba(0, 0, 0, 0.65);
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 19px;
+      border-bottom: 1px solid #2f3336;
+      z-index: 10;
+    }
+
+    .feed-container {
+      /* tempat tweet dimuat */
+    }
+
+    /* SIDEBAR KANAN */
+    .sidebar-right {
+      width: 350px;
+      flex-shrink: 0;
+      padding: 0 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .search-box {
+      background: #202327;
+      border-radius: 999px;
+      padding: 12px 16px;
+      margin: 8px 0 16px;
+      color: #71767b;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+    }
+
+    .trends-card {
+      background: #16181c;
+      border-radius: 16px;
+      padding: 12px 0;
+      margin-bottom: 16px;
+    }
+
+    .trends-title {
+      font-weight: 800;
+      font-size: 19px;
+      padding: 0 16px 12px;
+    }
+
+    .trend-item {
+      padding: 10px 16px;
+      cursor: default;
+    }
+
+    .trend-item:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .trend-category {
+      font-size: 13px;
+      color: #71767b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .trend-name {
+      font-weight: 700;
+      font-size: 15px;
+      margin-top: 2px;
+    }
+
+    .trend-tweets {
+      font-size: 13px;
+      color: #71767b;
+      margin-top: 4px;
+    }
+
+    .show-more {
+      color: #1d9bf0;
+      font-size: 14px;
+      padding: 12px 16px;
+      cursor: default;
+      border-radius: 0 0 16px 16px;
+    }
+
+    .show-more:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* TWEET CARD */
+    .tweet {
+      display: flex;
+      padding: 12px 16px;
+      border-bottom: 1px solid #2f3336;
+      cursor: default;
+      transition: background 0.2s;
+    }
+
+    .tweet:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tweet-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #1d9bf0;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      font-size: 20px;
+      margin-right: 12px;
+    }
+
+    .tweet-body {
+      flex: 1;
+    }
+
+    .tweet-header {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 14px;
+      line-height: 18px;
+      margin-bottom: 2px;
+    }
+
+    .tweet-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .tweet-handle,
+    .tweet-time {
+      color: #71767b;
+    }
+
+    .tweet-text {
+      font-size: 15px;
+      line-height: 20px;
+      margin-bottom: 12px;
+      word-wrap: break-word;
+    }
+
+    .tweet-actions {
+      display: flex;
+      justify-content: space-between;
+      max-width: 425px;
+      color: #71767b;
+      font-size: 13px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: default;
+      padding: 4px;
+      border-radius: 999px;
+      transition: all 0.2s;
+    }
+
+    .action-btn i {
+      font-size: 16px;
+    }
+
+    .action-btn:hover.reply { color: #1d9bf0; background: rgba(29,155,240,0.1); }
+    .action-btn:hover.retweet { color: #00ba7c; background: rgba(0,186,124,0.1); }
+    .action-btn:hover.like { color: #f91880; background: rgba(249,24,128,0.1); }
+    .action-btn:hover.share { color: #1d9bf0; background: rgba(29,155,240,0.1); }
+
+    /* SKELETON LOADING */
+    .loading {
+      display: flex;
+      padding: 12px 16px;
+      border-bottom: 1px solid #2f3336;
+      animation: pulse 1.5s infinite;
+    }
+
+    .loading .avatar-skeleton {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #222;
+      margin-right: 12px;
+    }
+
+    .loading .text-skeleton {
+      flex: 1;
+    }
+
+    .loading .line {
+      height: 12px;
+      background: #222;
+      margin-bottom: 8px;
+      border-radius: 12px;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .sidebar-right {
+        display: none;
+      }
+      .main-feed {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-left {
+        display: none;
+      }
+      .main-feed {
+        width: 100%;
+        border-right: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- KOLOM KIRI (NAVIGASI) -->
+    <nav class="sidebar-left">
+      <div>
+        <a href="#" class="nav-logo"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="nav-item active"><i class="fas fa-home"></i> <span>Home</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-hashtag"></i> <span>Explore</span></a>
+        <a href="#" class="nav-item"><i class="far fa-bell"></i> <span>Notifications</span></a>
+        <a href="#" class="nav-item"><i class="far fa-envelope"></i> <span>Messages</span></a>
+        <a href="#" class="nav-item"><i class="far fa-bookmark"></i> <span>Bookmarks</span></a>
+        <a href="#" class="nav-item"><i class="far fa-list-alt"></i> <span>Lists</span></a>
+        <a href="#" class="nav-item"><i class="far fa-user"></i> <span>Profile</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-ellipsis-h"></i> <span>More</span></a>
+        <div class="tweet-btn">Tweet</div>
+      </div>
+      <div class="user-menu">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name">AI_user</span>
+          <span class="user-handle">@ai_twitter</span>
+        </div>
+        <i class="fas fa-ellipsis-h more-icon"></i>
+      </div>
+    </nav>
+
+    <!-- KOLOM TENGAH (FEED) -->
+    <main class="main-feed">
+      <div class="header">Home</div>
+      <div id="feed" class="feed-container"></div>
+    </main>
+
+    <!-- KOLOM KANAN (TRENDS) -->
+    <aside class="sidebar-right">
+      <div class="search-box">
+        <i class="fas fa-search"></i> Search AI tweets
+      </div>
+      <div class="trends-card">
+        <div class="trends-title">Trends for you</div>
+        <div class="trend-item">
+          <div class="trend-category"><span>Trending in AI</span><i class="fas fa-ellipsis-h"></i></div>
+          <div class="trend-name">#GenerativeAI</div>
+          <div class="trend-tweets">2,410 posts</div>
+        </div>
+        <div class="trend-item">
+          <div class="trend-category"><span>Technology · Trending</span><i class="fas fa-ellipsis-h"></i></div>
+          <div class="trend-name">Machine Learning</div>
+          <div class="trend-tweets">12.4K posts</div>
+        </div>
+        <div class="trend-item">
+          <div class="trend-category"><span>Only on X</span><i class="fas fa-ellipsis-h"></i></div>
+          <div class="trend-name">TweetQuilter</div>
+          <div class="trend-tweets">1,880 posts</div>
+        </div>
+        <div class="show-more">Show more</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function() {
+      // ================= DATA GLOBAL =================
+      let tokens = [];
+      let patches = [];
+      let patchMap = {};
+      let patchMeaningful = [];
+      let memori = [];
+      let memoriSet = new Set();
+      const kapasitas_memori = 5;
+      const panjang_patch = 7;
+      let dataLoaded = false;
+      let loadingInProgress = false;
+
+      // Fungsi utilitas
+      function kataBermakna(tokens) {
+        const tanda = new Set([".", ",", "!", "?", ";", ":"]);
+        return tokens.filter(t => !tanda.has(t));
+      }
+
+      function randomChoice(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      // Memori
+      function initMemori() {
+        const kata = tokens.filter(t => ![".", ",", "!", "?", ";", ":"].includes(t));
+        memori = [];
+        memoriSet.clear();
+        while (memori.length < kapasitas_memori && kata.length > 0) {
+          let k = randomChoice(kata);
+          if (!memoriSet.has(k)) {
+            memori.push(k);
+            memoriSet.add(k);
+          }
+        }
+      }
+
+      function pilihKataBias(buffer) {
+        let kata = kataBermakna(buffer);
+        if (!kata.length) return null;
+        let n = kata.length;
+        if (n <= 2) return randomChoice(kata);
+        let weights = [];
+        for (let i = 0; i < n; i++) {
+          weights.push(1.0 - (0.4 * Math.min(i, n - 1 - i) / Math.floor(n / 2)));
+        }
+        let sum = weights.reduce((a, b) => a + b, 0);
+        let r = Math.random() * sum;
+        for (let i = 0; i < n; i++) {
+          r -= weights[i];
+          if (r <= 0) return kata[i];
+        }
+        return kata[0];
+      }
+
+      function updateMemori(buffer) {
+        for (let i = 0; i < 15; i++) {
+          let k = pilihKataBias(buffer);
+          if (k && !memoriSet.has(k) && k.length > 3) {
+            if (memori.length >= kapasitas_memori) {
+              let old = memori.shift();
+              memoriSet.delete(old);
+            }
+            memori.push(k);
+            memoriSet.add(k);
+            return;
+          }
+        }
+      }
+
+      // Scoring
+      function skorMemori(patch) {
+        let s = 0;
+        for (let k of patch) {
+          if (memoriSet.has(k)) s++;
+        }
+        return s;
+      }
+
+      function cariKataDekat(patchIdx) {
+        const kataPatch = new Set(patchMeaningful[patchIdx]);
+        for (let m of memori) {
+          let posMem = [];
+          for (let i = 0; i < tokens.length; i++) {
+            if (tokens[i] === m) posMem.push(i);
+          }
+          for (let p of kataPatch) {
+            let posP = [];
+            for (let i = 0; i < tokens.length; i++) {
+              if (tokens[i] === p) posP.push(i);
+            }
+            for (let pm of posMem) {
+              for (let pp of posP) {
+                if (Math.abs(pm - pp) <= 10) return 1;
+              }
+            }
+          }
+        }
+        return 0;
+      }
+
+      // Generate teks
+      function generateText(target = 30) {
+        if (!patches.length) return "Loading...";
+        let buffer = [...randomChoice(patches)];
+        let attempts = 0;
+        const maxAttempts = 100;
+        while (buffer.length < target && attempts < maxAttempts) {
+          let last = buffer[buffer.length - 1];
+          let kandidat = patchMap[last];
+          if (!kandidat || kandidat.length === 0) break;
+          if (kandidat.length > 200) {
+            kandidat = kandidat.sort(() => 0.5 - Math.random()).slice(0, 200);
+          }
+          // Cari patch dengan skor memori tertinggi (atau fallback)
+          let bestIdx = kandidat[0];
+          let bestScore = -1;
+          for (let idx of kandidat) {
+            let s = skorMemori(patches[idx]);
+            if (s > bestScore) {
+              bestScore = s;
+              bestIdx = idx;
+            }
+          }
+          if (bestScore === 0) {
+            for (let idx of kandidat) {
+              if (cariKataDekat(idx) > 0) {
+                bestIdx = idx;
+                break;
+              }
+            }
+          }
+          let patch = patches[bestIdx];
+          // Tambahkan sebagian dari patch (hindari menambah kata pertama yang sudah ada)
+          let startIdx = 1;
+          if (patch.length > startIdx) {
+            buffer.push(...patch.slice(startIdx, Math.min(patch.length, startIdx + 3)));
+          }
+          updateMemori(buffer);
+          attempts++;
+        }
+        return buffer.join(' ');
+      }
+
+      // ================= FUNGSI TAMPILAN =================
+      const namesList = ['andi', 'raka', 'dinda', 'user123', 'galau', 'toxic', 'aura', 'zen', 'lunox', 'gusion', 'hayabusa', 'miya', 'layla'];
+      const handlePrefix = '@';
+
+      function getRandomName() {
+        return namesList[Math.floor(Math.random() * namesList.length)];
+      }
+
+      function getInitials(name) {
+        return name.charAt(0).toUpperCase();
+      }
+
+      function getRandomTime() {
+        const now = new Date();
+        const minutesAgo = Math.floor(Math.random() * 120);
+        const hoursAgo = Math.floor(Math.random() * 24);
+        const daysAgo = Math.floor(Math.random() * 7);
+        if (minutesAgo < 60) return `${minutesAgo}m`;
+        if (hoursAgo < 24) return `${hoursAgo}h`;
+        return `${daysAgo}d`;
+      }
+
+      function getRandomCount(max) {
+        return Math.floor(Math.random() * max);
+      }
+
+      // Buat elemen tweet kompleks
+      function createTweet(text) {
+        const tweetDiv = document.createElement('div');
+        tweetDiv.className = 'tweet';
+        const name = getRandomName();
+        const handle = handlePrefix + name;
+        const initials = getInitials(name);
+        const time = getRandomTime();
+        const replies = getRandomCount(20);
+        const retweets = getRandomCount(50);
+        const likes = getRandomCount(200);
+        const views = getRandomCount(1000);
+
+        tweetDiv.innerHTML = `
+          <div class="tweet-avatar">${initials}</div>
+          <div class="tweet-body">
+            <div class="tweet-header">
+              <span class="tweet-name">${name}</span>
+              <span class="tweet-handle">${handle}</span>
+              <span class="tweet-time">· ${time}</span>
+            </div>
+            <div class="tweet-text">${text}</div>
+            <div class="tweet-actions">
+              <div class="action-btn reply"><i class="far fa-comment"></i> ${replies}</div>
+              <div class="action-btn retweet"><i class="fas fa-retweet"></i> ${retweets}</div>
+              <div class="action-btn like"><i class="far fa-heart"></i> ${likes}</div>
+              <div class="action-btn share"><i class="far fa-share-square"></i> ${views}</div>
+            </div>
+          </div>
+        `;
+        return tweetDiv;
+      }
+
+      // Skeleton loading
+      function createLoadingSkeleton() {
+        const div = document.createElement('div');
+        div.className = 'loading';
+        div.innerHTML = `
+          <div class="avatar-skeleton"></div>
+          <div class="text-skeleton">
+            <div class="line" style="width:40%"></div>
+            <div class="line" style="width:90%"></div>
+            <div class="line" style="width:70%"></div>
+          </div>
+        `;
+        return div;
+      }
+
+      // ================= LOAD DATA =================
+      async function loadData() {
+        try {
+          const res = await fetch('data.json');
+          if (!res.ok) throw new Error('Network error');
+          const data = await res.json();
+          tokens = data.tokens;
+          patchMap = data.patch_map;
+
+          // Rebuild patches
+          patches = [];
+          patchMeaningful = [];
+          for (let i = 0; i < tokens.length - panjang_patch; i++) {
+            const p = tokens.slice(i, i + panjang_patch);
+            patches.push(p);
+            patchMeaningful.push(kataBermakna(p));
+          }
+          initMemori();
+          dataLoaded = true;
+        } catch (e) {
+          console.error('Gagal memuat data.json:', e);
+          // Jika gagal, set dummy agar tidak crash
+          tokens = ['contoh', 'teks', 'untuk', 'fallback', '.'];
+          patchMap = {};
+          patches = [['contoh','teks','untuk','fallback','.']];
+          patchMeaningful = [['contoh','teks','untuk','fallback','.']];
+          initMemori();
+          dataLoaded = true;
+        }
+      }
+
+      // ================= GENERATE BATCH =================
+      async function generateBatch(count = 5) {
+        if (!dataLoaded || loadingInProgress) return;
+        loadingInProgress = true;
+
+        const feed = document.getElementById('feed');
+        const loaders = [];
+        for (let i = 0; i < count; i++) {
+          const loader = createLoadingSkeleton();
+          loaders.push(loader);
+          feed.appendChild(loader);
+        }
+        
+        // Delay agar efek loading terlihat
+        await new Promise(r => setTimeout(r, 600));
+
+        // Hapus skeleton
+        loaders.forEach(l => l.remove());
+
+        // Tambahkan tweet asli
+        for (let i = 0; i < count; i++) {
+          const text = generateText(15 + Math.floor(Math.random() * 20));
+          const tweetEl = createTweet(text);
+          feed.appendChild(tweetEl);
+        }
+
+        loadingInProgress = false;
+      }
+
+      // ================= INFINITE SCROLL =================
+      function handleScroll() {
+        if (!dataLoaded || loadingInProgress) return;
+        const scrollPos = window.innerHeight + window.scrollY;
+        const threshold = document.body.offsetHeight - 400;
+        if (scrollPos >= threshold) {
+          generateBatch(5);
+        }
+      }
+
+      // ================= INISIALISASI =================
+      window.addEventListener('load', async () => {
+        await loadData();
+        await generateBatch(10);
+      });
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+
+      // Ekspos ke global jika diperlukan (tidak perlu sebenarnya)
+    })();
+  </script>
+</body>
+</html>
